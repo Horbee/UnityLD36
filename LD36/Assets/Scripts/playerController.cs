@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class playerController : MonoBehaviour {
 
+	public GameObject dashButton;
+
 	public AudioClip death, jump, dashWav, explosion, pickup;
 	AudioSource audioS;
 
@@ -56,8 +58,8 @@ public class playerController : MonoBehaviour {
 			audioS.Play();
 		}
 
-		//float h = Input.GetAxis ("Horizontal");
-		float h = Input.acceleration.x;
+		float h = Input.GetAxis ("Horizontal");
+		//float h = Input.acceleration.x;
 
 		if (h * rb.velocity.x < maxSpeed)
 			//rb.velocity = new Vector2(h * 8, rb.velocity.y);
@@ -68,9 +70,41 @@ public class playerController : MonoBehaviour {
 
 	//	rb.velocity = new Vector2(h * 5, rb.velocity.y);
 
+		playerDash (h);
+
+		//if (isInBoundsDashButton (Input.GetTouch().position.x, Input.GetTouch().position.y))
+		//	Debug.Log ("Correct!");
+	//	Input.GetTouch ().position == dashButton.transform.position;
+
+
+		if (h < 0 && facingRight) {
+			flip ();
+		} else if (h > 0 && !facingRight) {
+			flip ();
+		}
+
+	}
+
+	public void playerDash(float h){
 		dashSlider.value = dash;
 
-		if (Input.GetAxis ("Fire1") > 0 && dash > 0) {
+		float x = Input.GetTouch (0).position.x;
+		float y = Input.GetTouch (0).position.y;
+
+		//ANDROID
+		if (isInBoundsDashButton (x, y) && dash > 0) {
+			dashing = true;
+			dash -= Time.deltaTime;
+			//rb.AddForce (new Vector2 (h * dashForce, 0));
+			rb.AddForce (Vector2.right * h * dashForce);
+			audioS.clip = dashWav;
+			audioS.Play();
+		} else {
+			dashing = false;
+		}
+
+		//PC
+	/*	if (Input.GetAxis ("Fire1") > 0 && dash > 0) {
 			dashing = true;
 			dash -= Time.deltaTime;
 			//rb.AddForce (new Vector2 (h * dashForce, 0));
@@ -80,17 +114,17 @@ public class playerController : MonoBehaviour {
 		} 
 		if(Input.GetAxis ("Fire1") == 0 ) {
 			dashing = false;
-		}
+		}*/
+
 
 		if (!dashing && dash < maxDash)
 			dash+= 0.02f;
+	}
 
-		if (h < 0 && facingRight) {
-			flip ();
-		} else if (h > 0 && !facingRight) {
-			flip ();
-		}
-
+	bool isInBoundsDashButton(float x, float y){
+		bool horiz = (x > dashButton.transform.position.x && x < dashButton.transform.position.x + 200);
+		bool vert = (y > dashButton.transform.position.y && y < dashButton.transform.position.y + 100);
+		return (horiz && vert);
 	}
 
 	void flip(){
