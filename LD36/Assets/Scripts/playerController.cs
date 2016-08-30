@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 public class playerController : MonoBehaviour {
 
 	public GameObject dashButton;
+	public GameObject jumpButton;
+	jumpBtn jumpScript;
+
 
 	public AudioClip death, jump, dashWav, explosion, pickup;
 	AudioSource audioS;
@@ -38,6 +41,9 @@ public class playerController : MonoBehaviour {
 		dashSlider.value = dash;
 		itemText.text = "Items: " + dashItems;
 		audioS = GetComponent<AudioSource> ();
+
+		//buttomScripts for Android
+		jumpScript = jumpButton.GetComponent<jumpBtn>();
 	}
 
 	void Update(){
@@ -51,15 +57,15 @@ public class playerController : MonoBehaviour {
 		//grounded = Physics2D.OverlapCircle (groundCheck.position, groundCheckRadius, groundLayer);
 		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
 
-		if (grounded && (Input.GetAxis ("Jump")>0 || Input.GetMouseButtonDown(0))) {
+		if (grounded && (Input.GetAxis ("Jump")>0 || jumpScript.getTouched())) {
 			grounded = false;
 			rb.AddForce (new Vector2 (0, jumpHeight));
 			audioS.clip = jump;
 			audioS.Play();
 		}
 
-		float h = Input.GetAxis ("Horizontal");
-		//float h = Input.acceleration.x;
+		//float h = Input.GetAxis ("Horizontal");
+		float h = Input.acceleration.x;
 
 		if (h * rb.velocity.x < maxSpeed)
 			//rb.velocity = new Vector2(h * 8, rb.velocity.y);
