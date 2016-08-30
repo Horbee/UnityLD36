@@ -49,14 +49,15 @@ public class playerController : MonoBehaviour {
 		//grounded = Physics2D.OverlapCircle (groundCheck.position, groundCheckRadius, groundLayer);
 		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
 
-		if (grounded && Input.GetAxis ("Jump")>0) {
+		if (grounded && (Input.GetAxis ("Jump")>0 || Input.GetMouseButtonDown(0))) {
 			grounded = false;
 			rb.AddForce (new Vector2 (0, jumpHeight));
 			audioS.clip = jump;
 			audioS.Play();
 		}
 
-		float h = Input.GetAxis ("Horizontal");
+		//float h = Input.GetAxis ("Horizontal");
+		float h = Input.acceleration.x;
 
 		if (h * rb.velocity.x < maxSpeed)
 			//rb.velocity = new Vector2(h * 8, rb.velocity.y);
